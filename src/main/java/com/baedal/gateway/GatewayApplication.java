@@ -1,4 +1,4 @@
-package com.bidmall.gateway;
+package com.baedal.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
