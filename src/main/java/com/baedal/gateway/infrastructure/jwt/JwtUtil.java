@@ -1,6 +1,5 @@
-package com.baedal.gateway.infrastructure.adapter.out;
+package com.baedal.gateway.infrastructure.jwt;
 
-import com.baedal.gateway.application.port.out.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -16,13 +15,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class JwtAdapter implements JwtTokenProvider {
+public class JwtUtil {
 
   private final SecretKey key;
 
   private final Long tokenExpirationSecond;
 
-  public JwtAdapter(
+  public JwtUtil(
       @Value("${jwt.secret}") String secret,
       @Value("${jwt.expiration}") Long expiration) {
     this.key = new SecretKeySpec(

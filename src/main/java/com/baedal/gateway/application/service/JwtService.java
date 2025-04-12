@@ -1,30 +1,29 @@
 package com.baedal.gateway.application.service;
 
-import com.baedal.gateway.application.port.in.JwtUseCase;
-import com.baedal.gateway.application.port.out.JwtTokenProvider;
 import com.baedal.gateway.domain.model.Role;
+import com.baedal.gateway.infrastructure.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class JwtService implements JwtUseCase {
+public class JwtService {
 
-  private final JwtTokenProvider jwtTokenProvider;
+  private final JwtUtil util;
 
   public String createCustomerToken(String email) {
-    return jwtTokenProvider.createToken(email, Role.CUSTOMER.getRole());
+    return util.createToken(email, Role.CUSTOMER.getRole());
   }
 
   public String createOwnerToken(String email) {
-    return jwtTokenProvider.createToken(email, Role.OWNER.getRole());
+    return util.createToken(email, Role.OWNER.getRole());
   }
 
   public String createRiderToken(String email) {
-    return jwtTokenProvider.createToken(email, Role.RIDER.getRole());
+    return util.createToken(email, Role.RIDER.getRole());
   }
 
   public void validateToken(String token, String expectedRole) {
-    jwtTokenProvider.validateToken(token, expectedRole);
+    util.validateToken(token, expectedRole);
   }
 }
