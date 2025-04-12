@@ -5,7 +5,6 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.nio.charset.StandardCharsets;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -15,13 +14,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class JwtUtil {
+public class JwtValidator {
 
   private final SecretKey key;
 
   private final Long tokenExpirationSecond;
 
-  public JwtUtil(
+  public JwtValidator(
       @Value("${jwt.secret}") String secret,
       @Value("${jwt.expiration}") Long expiration) {
     this.key = new SecretKeySpec(
@@ -30,22 +29,7 @@ public class JwtUtil {
     this.tokenExpirationSecond = expiration;
   }
 
-  public String createToken(String email, String role) {
-    Claims claims = Jwts.claims()
-        .add("id", email)
-        .add("role", role)
-        .build();
-    ZonedDateTime now = ZonedDateTime.now();
-    ZonedDateTime expiration = now.plusSeconds(tokenExpirationSecond);
-
-    return Jwts.builder()
-        .claims(claims)
-        .issuedAt(Date.from(now.toInstant()))
-        .expiration(Date.from(expiration.toInstant()))
-        .signWith(key)
-        .compact();
-  }
-
+  // TODO: Exception 발생 및 처리
   public void validateToken(String token, String expectedRole) {
     try {
       Jws<Claims> jwsClaims = Jwts.parser()
@@ -62,7 +46,7 @@ public class JwtUtil {
       if (!role.equals(expectedRole)) {
         throw new RuntimeException("Unauthorized");
       }
-    } catch (JwtException | IllegalArgumentException exception) {
+    } catch (JwtException exception) {
       log.debug(exception.getMessage());
       throw exception;
     }
