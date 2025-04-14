@@ -19,6 +19,14 @@ spring:
             - Path=/api/customer/**
           filters:
             - StripPrefix=2
+            - name: PreAuthorizationFilterFactory
+              args:
+                headerName: Authorization
+                granted: Bearer
+            - name: PostAuthenticationFilterFactory
+              args:
+                headerName: Authorization
+                granted: Bearer
 
 #        - id: rider
 #          uri: http://localhost:8081
