@@ -1,6 +1,5 @@
 package com.baedal.gateway.filter;
 
-import com.baedal.gateway.domain.model.Role;
 import com.baedal.gateway.infrastructure.jwt.JwtCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
@@ -59,7 +58,7 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
         String email = (String) response.get("email");
 
         String headerValue =
-            config.getGranted() + " " + jwtCreator.createToken(id, email, Role.CUSTOMER.getRole());
+            config.getGranted() + " " + jwtCreator.createToken(id, email, config.getRole());
 
         exchange.getResponse().getHeaders().add(HttpHeaders.AUTHORIZATION, headerValue);
 

@@ -21,23 +21,33 @@ spring:
             - StripPrefix=2
             - name: PreAuthorizationFilterFactory
               args:
-                headerName: Authorization
-                granted: Bearer
+                role: ROLE_CUSTOMER
             - name: PostAuthenticationFilterFactory
               args:
-                headerName: Authorization
-                granted: Bearer
+                role: ROLE_CUSTOMER
 
-#        - id: rider
-#          uri: http://localhost:8081
-#          predicates:
-#            - Path=/api/rider/**
-#          filters:
-#            - StripPrefix=2
-#
-#        - id: owner
-#          uri: http://localhost:8082
-#          predicates:
-#            - Path=/api/owner/**
-#          filters:
-#            - StripPrefix=2
+        - id: rider
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/rider/**
+          filters:
+            - StripPrefix=2
+            - name: PreAuthorizationFilterFactory
+              args:
+                role: ROLE_RIDER
+            - name: PostAuthenticationFilterFactory
+              args:
+                role: ROLE_RIDER
+
+        - id: owner
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/owner/**
+          filters:
+            - StripPrefix=2
+            - name: PreAuthorizationFilterFactory
+              args:
+                role: ROLE_OWNER
+            - name: PostAuthenticationFilterFactory
+              args:
+                role: ROLE_OWNER

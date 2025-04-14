@@ -6,5 +6,6 @@ import lombok.Data;
 public class JwtFilterConfig {
   private String headerName = "Authorization";
   private String granted = "Bearer";
+  private String role;
 }
 

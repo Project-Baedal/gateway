@@ -40,7 +40,7 @@ public class PreAuthorizationFilterFactory extends
         try {
           // TODO: 각 회원 별 role 검증은 어떻게 할까?
           //  - /api/domain/** domain 마다의 role 검증.
-          validator.validateToken(token, Role.CUSTOMER.getRole());
+          validator.validateToken(token, config.getRole());
           log.debug("JWT 검증 성공");
           return chain.filter(exchange);
         } catch (JwtException e) {

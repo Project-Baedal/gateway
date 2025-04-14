@@ -48,7 +48,8 @@ public class JwtValidator {
 
       String role = jwsClaims.getPayload().get("role", String.class);
       if (!role.equals(expectedRole)) {
-        throw new RuntimeException("Unauthorized");
+        log.debug("Unauthorized, role={}, expected={}", role, expectedRole);
+        throw new RuntimeException("Not allowed operation");
       }
     } catch (JwtException exception) {
       log.debug(exception.getMessage());
