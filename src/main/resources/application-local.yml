@@ -1,0 +1,30 @@
+server:
+  port: 9000
+
+logging:
+  level:
+    com.baedal: DEBUG
+
+jwt:
+  secret: my-local-secret-key-should-be-long-enough
+  expiration: 1800
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: customer
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/customer/**
+          filters:
+            - StripPrefix=1
+#        - id: owner
+#          uri:
+#          predicates:
+#          filters:
+#
+#        - id: rider
+#          uri:
+#          predicates:
+#          filters:
