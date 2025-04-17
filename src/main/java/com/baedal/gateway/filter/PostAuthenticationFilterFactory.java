@@ -49,13 +49,12 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
       try {
         Map<String, Object> response = mapper.readValue(body, Map.class);
 
-        if (!response.containsKey("id") || !response.containsKey("email")) {
-          log.warn("로그인 응답으로 ID, Email이 없음");
+        if (!response.containsKey("id")) {
+          log.warn("로그인 응답으로 ID가 없음.");
           return Mono.justOrEmpty(body);
         }
 
         long id = ((Number) response.get("id")).longValue();
-        String email = (String) response.get("email");
 
         String headerValue =
             config.getGranted() + " " + jwtCreator.createToken(id, config.getRole());
