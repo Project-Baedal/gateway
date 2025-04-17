@@ -28,10 +28,9 @@ public class JwtCreator {
     this.tokenExpirationSecond = expiration;
   }
 
-  public String createToken(Long id, String email, String role) {
+  public String createToken(Long id, String role) {
     Claims claims = Jwts.claims()
         .add("id", id)
-        .add("email", email)
         .add("role", role)
         .build();
     ZonedDateTime now = ZonedDateTime.now();

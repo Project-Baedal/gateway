@@ -58,7 +58,7 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
         String email = (String) response.get("email");
 
         String headerValue =
-            config.getGranted() + " " + jwtCreator.createToken(id, email, config.getRole());
+            config.getGranted() + " " + jwtCreator.createToken(id, config.getRole());
 
         exchange.getResponse().getHeaders().add(HttpHeaders.AUTHORIZATION, headerValue);
 
