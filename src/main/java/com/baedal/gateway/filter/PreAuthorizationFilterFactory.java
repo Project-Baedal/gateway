@@ -1,14 +1,20 @@
 package com.baedal.gateway.filter;
 
-import com.baedal.gateway.domain.model.Role;
+import com.baedal.gateway.infrastructure.jwt.JwtProvider;
 import com.baedal.gateway.infrastructure.jwt.JwtValidator;
 import io.jsonwebtoken.JwtException;
+import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
@@ -17,9 +23,12 @@ public class PreAuthorizationFilterFactory extends
 
   private final JwtValidator validator;
 
-  public PreAuthorizationFilterFactory(JwtValidator validator) {
+  private final JwtProvider provider;
+
+  public PreAuthorizationFilterFactory(JwtValidator validator, JwtProvider provider) {
     super(JwtFilterConfig.class);
     this.validator = validator;
+    this.provider = provider;
   }
 
   @Override
@@ -38,17 +47,41 @@ public class PreAuthorizationFilterFactory extends
         String token = authorizationHeader.substring(config.getGranted().length() + 1); // Bearer
 
         try {
-          // TODO: 각 회원 별 role 검증은 어떻게 할까?
-          //  - /api/domain/** domain 마다의 role 검증.
-          validator.validateToken(token, config.getRole());
-          log.debug("JWT 검증 성공");
-          return chain.filter(exchange);
+          validator.validateToken(token);
+
+          ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+              .header("X-User-Id", provider.extractId(token).toString())
+              .header("X-User-Role", provider.extractRole(token))
+              .build();
+
+          return chain.filter(exchange.mutate()
+              .request(mutatedRequest)
+              .build());
         } catch (JwtException e) {
-          log.error("JWT 검증 실패: {}", e.getMessage());
+          String exceptionClass = e.getClass().getName();
+          String exceptionMessage = e.getMessage();
+
+          String errorBody = String.format(
+              "{ \"error\": \"%s\", \"message\": \"%s\" }",
+              exceptionClass,
+              exceptionMessage
+          );
+
+          exchange.getResponse()
+              .getHeaders()
+              .add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+          exchange.getResponse()
+              .setStatusCode(HttpStatus.UNAUTHORIZED);
+
+          byte[] bytes = errorBody.getBytes(StandardCharsets.UTF_8);
+          DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
+
+          return exchange.getResponse()
+              .writeWith(Mono.just(buffer))
+              .doOnSuccess(v -> log.debug("Sent UNAUTHORIZED response"));
         }
       }
 
-      log.debug("UNAUTHORIZED authorization={}", authorizationHeader);
       exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
       return exchange.getResponse().setComplete();
     };

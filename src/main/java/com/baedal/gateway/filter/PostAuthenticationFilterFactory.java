@@ -65,7 +65,7 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
       } catch (Exception e) {
         log.error(e.getClass().getName());
         log.error(e.getMessage());
-        return Mono.error(new RuntimeException("JWT 생성 실패", e));
+        return Mono.error(e);
       }
     });
 
