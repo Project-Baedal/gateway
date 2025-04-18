@@ -7,9 +7,9 @@ import lombok.Getter;
 @Getter
 public enum Role {
 
-  CUSTOMER("ROLE_CUSTOMER"),
-  OWNER("ROLE_OWNER"),
-  RIDER("ROLE_RIDER");
+  CUSTOMER("CUSTOMER"),
+  OWNER("OWNER"),
+  RIDER("RIDER");
 
   private final String role;
 }

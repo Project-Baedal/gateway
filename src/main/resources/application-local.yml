@@ -21,10 +21,10 @@ spring:
             - StripPrefix=2
             - name: PreAuthorizationFilterFactory
               args:
-                role: ROLE_CUSTOMER
+                role: CUSTOMER
             - name: PostAuthenticationFilterFactory
               args:
-                role: ROLE_CUSTOMER
+                role: CUSTOMER
 
         - id: rider
           uri: http://localhost:8081
@@ -34,10 +34,10 @@ spring:
             - StripPrefix=2
             - name: PreAuthorizationFilterFactory
               args:
-                role: ROLE_RIDER
+                role: RIDER
             - name: PostAuthenticationFilterFactory
               args:
-                role: ROLE_RIDER
+                role: RIDER
 
         - id: owner
           uri: http://localhost:8082
@@ -47,7 +47,7 @@ spring:
             - StripPrefix=2
             - name: PreAuthorizationFilterFactory
               args:
-                role: ROLE_OWNER
+                role: OWNER
             - name: PostAuthenticationFilterFactory
               args:
-                role: ROLE_OWNER
+                role: OWNER
