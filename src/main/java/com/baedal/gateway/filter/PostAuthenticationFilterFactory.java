@@ -42,16 +42,14 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
       }
 
       if (exchange.getResponse().getStatusCode() != HttpStatus.OK) {
-        log.debug("로그인 실패 {}", exchange.getResponse().getStatusCode());
-        return Mono.justOrEmpty(body);
+        return Mono.error(new RuntimeException("로그인 실패"));
       }
 
       try {
         Map<String, Object> response = mapper.readValue(body, Map.class);
 
         if (!response.containsKey("id")) {
-          log.warn("로그인 응답으로 ID가 없음.");
-          return Mono.justOrEmpty(body);
+          return Mono.error(new RuntimeException("로그인 응답으로 ID가 없음"));
         }
 
         long id = ((Number) response.get("id")).longValue();
