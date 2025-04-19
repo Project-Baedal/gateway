@@ -1,9 +1,12 @@
 package com.baedal.gateway.filter;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class JwtFilterConfig {
+
   private String headerName = "Authorization";
   private String granted = "Bearer";
   private String role;
