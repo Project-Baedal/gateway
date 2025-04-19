@@ -18,13 +18,36 @@ spring:
           predicates:
             - Path=/api/customer/**
           filters:
-            - StripPrefix=1
-#        - id: owner
-#          uri:
-#          predicates:
-#          filters:
-#
-#        - id: rider
-#          uri:
-#          predicates:
-#          filters:
+            - StripPrefix=2
+            - name: PreAuthorizationFilterFactory
+              args:
+                role: CUSTOMER
+            - name: PostAuthenticationFilterFactory
+              args:
+                role: CUSTOMER
+
+        - id: rider
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/rider/**
+          filters:
+            - StripPrefix=2
+            - name: PreAuthorizationFilterFactory
+              args:
+                role: RIDER
+            - name: PostAuthenticationFilterFactory
+              args:
+                role: RIDER
+
+        - id: owner
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/owner/**
+          filters:
+            - StripPrefix=2
+            - name: PreAuthorizationFilterFactory
+              args:
+                role: OWNER
+            - name: PostAuthenticationFilterFactory
+              args:
+                role: OWNER

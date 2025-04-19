@@ -21,7 +21,7 @@ class JwtTest {
 
   @Test
   void create_and_validate_token_success() {
-    String token = jwtCreator.createToken(1L, "example@gmail.com", Role.CUSTOMER.getRole());
+    String token = jwtCreator.createToken(1L, Role.CUSTOMER.getRole());
 
     assertThatCode(() -> jwtValidator.validateToken(token, Role.CUSTOMER.getRole()))
         .doesNotThrowAnyException();
@@ -29,7 +29,7 @@ class JwtTest {
 
   @Test
   void validate_token_fail_UNAUTHORIEZED_WRONG_ROLE() {
-    String token = jwtCreator.createToken(1L, "example@gmail.com", Role.CUSTOMER.getRole());
+    String token = jwtCreator.createToken(1L, Role.CUSTOMER.getRole());
 
     assertThatThrownBy(() -> jwtValidator.validateToken(token, Role.RIDER.getRole()))
         .isInstanceOf(RuntimeException.class);
