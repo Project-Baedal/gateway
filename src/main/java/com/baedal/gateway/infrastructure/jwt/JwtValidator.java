@@ -11,6 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 @Slf4j
@@ -35,6 +36,10 @@ public class JwtValidator {
   //  -MalformedJwtException : JWT가 올바르게 구성되지 않았을 때
   //  -SignatureException :  JWT의 기존 서명을 확인하지 못했을 때
   public void validateToken(String token) {
+    if (!StringUtils.hasText(token)) {
+      throw new IllegalArgumentException("token is null or empty.");
+    }
+
     try {
       Jws<Claims> jwsClaims = Jwts.parser()
           .verifyWith(key)
