@@ -9,9 +9,11 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
@@ -36,54 +38,56 @@ public class PreAuthorizationFilterFactory extends
     return (exchange, chain) -> {
       String path = exchange.getRequest().getURI().getPath();
 
-      if (path.endsWith("/login") || path.endsWith("/signup")) {
+      if (isPublicPath(path)) {
         return chain.filter(exchange);
       }
 
-      String authorizationHeader = exchange.getRequest().getHeaders()
-          .getFirst(config.getHeaderName());
-      if (StringUtils.hasText(authorizationHeader) &&
-          authorizationHeader.startsWith(config.getGranted() + " ")) {
-        String token = authorizationHeader.substring(config.getGranted().length() + 1); // Bearer
-
-        try {
-          validator.validateToken(token);
-
-          ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-              .header("X-User-Id", provider.extractId(token).toString())
-              .header("X-User-Role", provider.extractRole(token))
-              .build();
-
-          return chain.filter(exchange.mutate()
-              .request(mutatedRequest)
-              .build());
-        } catch (JwtException e) {
-          String exceptionClass = e.getClass().getName();
-          String exceptionMessage = e.getMessage();
-
-          String errorBody = String.format(
-              "{ \"error\": \"%s\", \"message\": \"%s\" }",
-              exceptionClass,
-              exceptionMessage
-          );
-
-          exchange.getResponse()
-              .getHeaders()
-              .add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-          exchange.getResponse()
-              .setStatusCode(HttpStatus.UNAUTHORIZED);
-
-          byte[] bytes = errorBody.getBytes(StandardCharsets.UTF_8);
-          DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
-
-          return exchange.getResponse()
-              .writeWith(Mono.just(buffer))
-              .doOnSuccess(v -> log.debug("Sent UNAUTHORIZED response"));
-        }
+      String token = extractToken(exchange.getRequest(), config);
+      if (token == null) {
+        return unauthorizedResponse(exchange.getResponse());
       }
 
-      exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-      return exchange.getResponse().setComplete();
+      try {
+        validator.validateToken(token);
+
+        ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+            .header("X-User-Id", provider.extractId(token).toString())
+            .header("X-User-Role", provider.extractRole(token))
+            .build();
+
+        return chain.filter(exchange.mutate()
+            .request(mutatedRequest)
+            .build());
+      } catch (JwtException e) {
+        log.debug(e.getMessage());
+        return unauthorizedResponse(exchange.getResponse());
+      }
     };
   }
+
+  private boolean isPublicPath(String path) {
+    return path.endsWith("/login") || path.endsWith("/signup");
+  }
+
+  private String extractToken(HttpRequest request, JwtFilterConfig config) {
+    String header = request.getHeaders().getFirst(config.getHeaderName());
+    if (StringUtils.hasText(header) &&
+        header.startsWith(config.getGranted() + " ")) {
+      return header.substring(config.getGranted().length() + 1);
+    }
+    return null;
+  }
+
+  private Mono<Void> unauthorizedResponse(ServerHttpResponse response) {
+    response.setStatusCode(HttpStatus.UNAUTHORIZED);
+
+    response.getHeaders()
+        .add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+    String errorBody = "{ \"error\": \"UNAUTHORIZED\", \"message\": \"Missing or invalid Authorization header\" }";
+
+    byte[] bytes = errorBody.getBytes(StandardCharsets.UTF_8);
+    DataBuffer buffer = response.bufferFactory().wrap(bytes);
+    return response.writeWith(Mono.just(buffer));
+  }
+
 }

@@ -26,7 +26,7 @@ class JwtTest {
     assertThatCode(() -> jwtValidator.validateToken(token))
         .doesNotThrowAnyException();
   }
-  
+
   @Test
   void validate_token_fail_TOKEN_STRANGE() {
     String token = "asd.adfadfa.eee";
