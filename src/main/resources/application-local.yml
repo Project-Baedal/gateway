@@ -4,10 +4,18 @@ server:
 logging:
   level:
     com.baedal: DEBUG
+    com.baedal.gateway.filter: TRACE
 
 jwt:
   secret: my-local-secret-key-should-be-long-enough
   expiration: 1800
+
+  headerName: Authorization
+  granted: Bearer
+
+  loginUrlEndsWith: /login
+  permitAllUrls: /login, /signup, /public/**
+
 
 spring:
   cloud:
@@ -19,9 +27,6 @@ spring:
             - Path=/api/customer/**
           filters:
             - StripPrefix=2
-            - name: PreAuthorizationFilterFactory
-              args:
-                role: CUSTOMER
             - name: PostAuthenticationFilterFactory
               args:
                 role: CUSTOMER
@@ -32,9 +37,6 @@ spring:
             - Path=/api/rider/**
           filters:
             - StripPrefix=2
-            - name: PreAuthorizationFilterFactory
-              args:
-                role: RIDER
             - name: PostAuthenticationFilterFactory
               args:
                 role: RIDER
@@ -45,9 +47,6 @@ spring:
             - Path=/api/owner/**
           filters:
             - StripPrefix=2
-            - name: PreAuthorizationFilterFactory
-              args:
-                role: OWNER
             - name: PostAuthenticationFilterFactory
               args:
                 role: OWNER

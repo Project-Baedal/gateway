@@ -61,8 +61,7 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
 
         return Mono.justOrEmpty(body);
       } catch (Exception e) {
-        log.error(e.getClass().getName());
-        log.error(e.getMessage());
+        log.debug(e.getMessage());
         return Mono.error(e);
       }
     });
