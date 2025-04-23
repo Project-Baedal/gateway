@@ -1,9 +1,13 @@
 package com.baedal.gateway.filter;
 
 import com.baedal.gateway.infrastructure.jwt.JwtCreator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.rewrite.ModifyResponseBodyGatewayFilterFactory;
@@ -22,6 +26,13 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
 
   ModifyResponseBodyGatewayFilterFactory modifyFactory;
 
+  @Value("${jwt.loginUrlEndsWith}")
+  private String loginUrl;
+
+  @Value("${jwt.permitAllUrls}")
+  private List<String> permitAllUrls;
+
+
   public PostAuthenticationFilterFactory(JwtCreator jwtCreator, ObjectMapper mapper,
       ModifyResponseBodyGatewayFilterFactory modifyFactory) {
     super(JwtFilterConfig.class);
@@ -37,7 +48,7 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
     innerConfig.setOutClass(String.class);
     innerConfig.setRewriteFunction(String.class, String.class, (exchange, body) -> {
       String path = exchange.getRequest().getURI().getPath();
-      if (!path.endsWith("/login")) { // signup
+      if (!isLogin(path)) { // signup
         return Mono.justOrEmpty(body);
       }
 
@@ -60,12 +71,15 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
         exchange.getResponse().getHeaders().add(HttpHeaders.AUTHORIZATION, headerValue);
 
         return Mono.justOrEmpty(body);
-      } catch (Exception e) {
-        log.debug(e.getMessage());
+      } catch (JsonProcessingException e) {
         return Mono.error(e);
       }
     });
 
     return modifyFactory.apply(innerConfig);
+  }
+
+  private boolean isLogin(String path) {
+    return path.endsWith(loginUrl);
   }
 }
