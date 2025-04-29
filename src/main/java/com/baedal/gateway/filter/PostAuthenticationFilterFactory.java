@@ -2,7 +2,6 @@ package com.baedal.gateway.filter;
 
 import com.baedal.gateway.infrastructure.jwt.JwtCreator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
