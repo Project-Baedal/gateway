@@ -14,8 +14,6 @@ jwt:
   granted: Bearer
 
   loginUrlEndsWith: /login
-  permitAllUrls: /login, /signup, /public/**
-
 
 spring:
   cloud:
