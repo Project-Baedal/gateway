@@ -2,9 +2,7 @@ package com.baedal.gateway.filter;
 
 import com.baedal.gateway.infrastructure.jwt.JwtCreator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,10 +27,6 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
   @Value("${jwt.loginUrlEndsWith}")
   private String loginUrl;
 
-  @Value("${jwt.permitAllUrls}")
-  private List<String> permitAllUrls;
-
-
   public PostAuthenticationFilterFactory(JwtCreator jwtCreator, ObjectMapper mapper,
       ModifyResponseBodyGatewayFilterFactory modifyFactory) {
     super(JwtFilterConfig.class);
@@ -48,14 +42,18 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
     innerConfig.setOutClass(String.class);
     innerConfig.setRewriteFunction(String.class, String.class, (exchange, body) -> {
       String path = exchange.getRequest().getURI().getPath();
-      if (!isLogin(path)) { // signup
+
+      // 로그인을 제외한 모든 경로.
+      if (!isLogin(path)) {
         return Mono.justOrEmpty(body);
       }
 
+      // Login Fail. 200 응답이 아닌 경우.
       if (exchange.getResponse().getStatusCode() != HttpStatus.OK) {
         return Mono.error(new RuntimeException("로그인 실패"));
       }
 
+      // Login Success.
       try {
         Map<String, Object> response = mapper.readValue(body, Map.class);
 
@@ -68,6 +66,7 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
         String headerValue =
             config.getGranted() + " " + jwtCreator.createToken(id, config.getRole());
 
+        // 응답 헤더에 토큰 추가.
         exchange.getResponse().getHeaders().add(HttpHeaders.AUTHORIZATION, headerValue);
 
         return Mono.justOrEmpty(body);

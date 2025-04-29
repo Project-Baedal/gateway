@@ -4,7 +4,6 @@ import com.baedal.gateway.infrastructure.jwt.JwtProvider;
 import com.baedal.gateway.infrastructure.jwt.JwtValidator;
 import io.jsonwebtoken.JwtException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,19 +40,15 @@ public class JwtFilter implements GlobalFilter, Ordered {
   @Value("${jwt.loginUrlEndsWith}")
   private String loginUrl;
 
-  @Value("${jwt.permitAllUrls}")
-  private List<String> permitAllUrls;
-
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
     String path = exchange.getRequest().getURI().getPath();
     log.debug("routing...{}", path);
 
-    if (isPublic(path)) {
+    String token = extractToken(exchange.getRequest());
+    if (token == null) {
       return chain.filter(exchange);
     }
-
-    String token = extractToken(exchange.getRequest());
 
     try {
       validator.validateToken(token);
@@ -74,15 +69,6 @@ public class JwtFilter implements GlobalFilter, Ordered {
 
   private boolean isLogin(String path) {
     return path.endsWith(loginUrl);
-  }
-
-  private boolean isPublic(String path) {
-    for (String permitAllEndsWithUrl : permitAllUrls) {
-      if (path.endsWith(permitAllEndsWithUrl)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private String extractToken(HttpRequest request) {
