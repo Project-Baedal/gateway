@@ -26,7 +26,7 @@ spring:
           predicates:
             - Path=/api/customer/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
             - name: PostAuthenticationFilterFactory
               args:
                 role: CUSTOMER
@@ -36,7 +36,7 @@ spring:
           predicates:
             - Path=/api/rider/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
             - name: PostAuthenticationFilterFactory
               args:
                 role: RIDER
@@ -46,7 +46,7 @@ spring:
           predicates:
             - Path=/api/owner/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
             - name: PostAuthenticationFilterFactory
               args:
                 role: OWNER
