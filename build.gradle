@@ -2,6 +2,22 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.google.cloud.tools.jib' version '3.4.5'
+}
+
+
+jib {
+    from {
+        image = "openjdk:21-jdk-slim"
+    }
+    to {
+        image = project.findProperty("dockerImageName")
+        tags = ["latest"]
+        auth {
+            username = project.findProperty("dockerUsername")
+            password = project.findProperty("dockerPassword")
+        }
+    }
 }
 
 group = 'com.baedal'

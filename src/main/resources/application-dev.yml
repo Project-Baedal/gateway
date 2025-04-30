@@ -20,7 +20,7 @@ spring:
     gateway:
       routes:
         - id: owner
-          uri: http://localhost:8087
+          uri: http://owner:8087
           predicates:
             - Path=/api/owner/**
           filters:
@@ -29,7 +29,7 @@ spring:
                 role: OWNER
 
         - id: customer
-          uri: http://localhost:8088
+          uri: http://customer:8088
           predicates:
             - Path=/api/customer/**
           filters:
@@ -38,7 +38,7 @@ spring:
                 role: CUSTOMER
 
         - id: rider
-          uri: http://localhost:8089
+          uri: http://rider:8089
           predicates:
             - Path=/api/rider/**
           filters:
@@ -47,32 +47,32 @@ spring:
                 role: RIDER
 
         - id: store
-          uri: http://localhost:8081
+          uri: http://store:8081
           predicates:
             - Path=/api/store/**
 
 
         - id: product
-          uri: http://localhost:8082
+          uri: http://product:8082
           predicates:
             - Path=/api/product/**
 
         - id: cart
-          uri: http://localhost:8083
+          uri: http://cart:8083
           predicates:
             - Path=/api/cart/**
 
         - id: order
-          uri: http://localhost:8084
+          uri: http://order:8084
           predicates:
             - Path=/api/order/**
 
         - id: payment
-          uri: http://localhost:8085
+          uri: http://payment:8085
           predicates:
             - Path=/api/payment/**
 
         - id: review
-          uri: http://localhost:8086
+          uri: http://review:8086
           predicates:
             - Path=/api/review/**
