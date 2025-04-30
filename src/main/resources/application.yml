@@ -1,7 +1,10 @@
 spring:
   application:
     name: gateway
+  profiles:
+    active: local
 
   output:
     ansi:
       enabled: always
+
