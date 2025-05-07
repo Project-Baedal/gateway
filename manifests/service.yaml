@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  labels:
+    app: gateway
+spec:
+  type: NodePort # 운영 환경: LoadBalancer나 Ingress를 추가로 사용
+  selector:
+    app: gateway # Deployment의 Pod 템플릿 레이블과 일치해야 함.
+  ports: # Service가 열어줄 포트 설정 리스트
+    - port: 80 # 클러스터 내부 서비스가 열어주는 포트, 다른 Pod나 Service가 이 이름(Service 이름)으로 접근할 때 사용.
+      targetPort: 8080 # 실제 Pod(컨테이너)에서 수신하는 포트
+      nodePort: 30080 # 클러스터 외부(Node IP)에서 이 Service에 접근할 수 있도록 매핑해 주는 포트, 클러스터의 모든 Node가 이 동일한 포트를 열고, 들어오는 트래픽을 port로 포워딩.
+    # 외부 30080(cluster) -> 80(service) -> 8080(pod)
