@@ -13,8 +13,6 @@ jwt:
   headerName: Authorization
   granted: Bearer
 
-  loginUrlEndsWith: /login
-
 spring:
   cloud:
     gateway:
@@ -50,7 +48,6 @@ spring:
           uri: http://store:8081
           predicates:
             - Path=/api/store/**
-
 
         - id: product
           uri: http://product:8082

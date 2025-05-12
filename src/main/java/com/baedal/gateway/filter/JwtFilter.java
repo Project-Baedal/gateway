@@ -67,10 +67,6 @@ public class JwtFilter implements GlobalFilter, Ordered {
     }
   }
 
-  private boolean isLogin(String path) {
-    return path.endsWith(loginUrl);
-  }
-
   private String extractToken(HttpRequest request) {
     String header = request.getHeaders().getFirst(headerName);
     if (StringUtils.hasText(header) &&
