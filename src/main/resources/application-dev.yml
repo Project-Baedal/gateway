@@ -64,6 +64,11 @@ spring:
           predicates:
             - Path=/api/order/**
 
+        - id: order-ws
+          uri: ws://localhost:8084
+          predicates:
+            - Path=/ws/order/**
+
         - id: payment
           uri: http://payment:8085
           predicates:
