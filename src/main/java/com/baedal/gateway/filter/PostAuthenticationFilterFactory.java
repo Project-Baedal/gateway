@@ -50,7 +50,7 @@ public class PostAuthenticationFilterFactory extends AbstractGatewayFilterFactor
 
       // Login Fail. 200 응답이 아닌 경우.
       if (exchange.getResponse().getStatusCode() != HttpStatus.OK) {
-        return Mono.error(new RuntimeException("로그인 실패"));
+        return Mono.justOrEmpty(body);
       }
 
       // Login Success.
