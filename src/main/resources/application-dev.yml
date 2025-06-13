@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 logging:
   level:
     com.baedal: DEBUG
@@ -20,7 +17,7 @@ spring:
     gateway:
       routes:
         - id: owner
-          uri: http://owner:8087
+          uri: http://owner
           predicates:
             - Path=/api/owner/**
           filters:
@@ -29,7 +26,7 @@ spring:
                 role: OWNER
 
         - id: customer
-          uri: http://customer:8088
+          uri: http://customer
           predicates:
             - Path=/api/customer/**
           filters:
@@ -38,7 +35,7 @@ spring:
                 role: CUSTOMER
 
         - id: rider
-          uri: http://rider:8089
+          uri: http://rider
           predicates:
             - Path=/api/rider/**
           filters:
@@ -47,32 +44,32 @@ spring:
                 role: RIDER
 
         - id: store
-          uri: http://store:8081
+          uri: http://store
           predicates:
             - Path=/api/store/**
 
 
         - id: product
-          uri: http://product:8082
+          uri: http://product
           predicates:
             - Path=/api/product/**
 
         - id: cart
-          uri: http://cart:8083
+          uri: http://cart
           predicates:
             - Path=/api/cart/**
 
         - id: order
-          uri: http://order:8084
+          uri: http://order
           predicates:
             - Path=/api/order/**
 
         - id: payment
-          uri: http://payment:8085
+          uri: http://payment
           predicates:
             - Path=/api/payment/**
 
         - id: review
-          uri: http://review:8086
+          uri: http://review
           predicates:
             - Path=/api/review/**

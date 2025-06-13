@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 logging:
   level:
     com.baedal: DEBUG
@@ -36,6 +33,11 @@ spring:
             - name: PostAuthenticationFilterFactory
               args:
                 role: CUSTOMER
+
+        - id: customer-swagger
+          uri: http://localhost:8088
+          predicates:
+            - Path=/customer/swagger-ui/**
 
         - id: rider
           uri: http://localhost:8089
